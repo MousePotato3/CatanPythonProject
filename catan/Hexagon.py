@@ -1,14 +1,15 @@
-'''
+"""
 Structure to hold the type, location, number, and value of each hexagon on the Catan board
 
 Created on Sep 2, 2022
 
 @author: Andrew Hubbard
-'''
+"""
 
 class Hexagon:
 
     def __init__(self, hexType):
+        self.location = None
         self.hexType = hexType
         self.number = 0
         self.value = 0
@@ -18,14 +19,14 @@ class Hexagon:
 
     def setNumber(self, number):
         self.number = number
-        if(number < 7):
+        if number < 7:
             self.value = number - 1
         else:
             self.value = 13 - number
 
     ''' Determines whether 2 Hexagon objects are equal (==) to each other '''
     def __eq__(self, other):
-        if(self.location==other.location):
+        if self.location == other.location:
             return True
         else:
             return False

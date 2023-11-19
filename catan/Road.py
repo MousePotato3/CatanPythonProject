@@ -1,10 +1,10 @@
-'''
+"""
 Structure to hold the locations, color, and player number of each road on the Catan board
 
 Created on Sep 2, 2022
 
 @author: Andrew Hubbard
-'''
+"""
 
 class Road:
 

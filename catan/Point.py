@@ -1,10 +1,10 @@
-'''
+"""
 Structure to hold the coordinates of each intersection on the Catan board
 
 Created on Sep 2, 2022
 
 @author: Andrew Hubbard
-'''
+"""
 
 class Point:
     def __init__(self, x, y):
@@ -13,7 +13,7 @@ class Point:
 
     ''' Determines whether 2 Point objects are equal (==) to each other '''
     def __eq__(self, other):
-        if(int(self.x-other.x)==0 and int(self.y-other.y)==0):
+        if int(self.x - other.x) == 0 and int(self.y - other.y) == 0:
             return True
         else:
             return False
