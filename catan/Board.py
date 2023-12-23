@@ -11,6 +11,7 @@ Created on Sep 2, 2022
 @author: Andrew Hubbard
 """
 from catan import City
+from catan import Dice
 from catan import Hexagon
 from catan import Point
 from catan import DoublePoint
@@ -19,7 +20,7 @@ from catan import Settlement
 from catan import Road
 from ctypes import windll
 from math import sqrt
-from random import shuffle, randrange
+from random import shuffle
 import PySimpleGUI
 
 """ Structure to hold the coordinates of each intersection on the Catan board """
@@ -27,7 +28,6 @@ class Board:
 
     def __init__(self, numPlayers):
         """ Identify the coordinates of the center of the screen """
-        self.robberLocation = None
         user32 = windll.user32
         self.centerX = user32.GetSystemMetrics(0) / 2.0
         self.centerY = user32.GetSystemMetrics(1) / 2.0
@@ -57,11 +57,13 @@ class Board:
             self.roads.append([])
             self.numResources.append(0)
             self.playerScores.append(0)
+        self.dice = Dice.Dice()
+        self.robberLocation = None
         self.turnNumber = 1
         self.winner = -1
         self.isVisible = True
 
-    """ This may not working currently """
+    """ This may not be working currently """
     def drawBoard(self):
         if not self.isVisible:
             return
@@ -100,10 +102,8 @@ class Board:
                 myIcon.DrawImage(filename="desert.jpg", location=(x, y))
 
     """ Roll 2 6-sided dice and return the result """
-    @staticmethod
-    def rollDice():
-        diceRoll = randrange(6) + randrange(6) + 2
-        return diceRoll
+    def rollDice(self):
+        return self.dice.rollDice()
 
     def setRobberLocation(self, robberLocation):
         self.robberLocation = robberLocation
