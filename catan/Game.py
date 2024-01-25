@@ -19,7 +19,7 @@ class Game:
         self.numPlayers = 4
         self.maxResources = 7
         self.pointsToWin = 10
-        self.playerToMove = 0
+        self.playerToMove = 1
 
         self.players.append(RandComp.RandComp(1, "red", "RandComp", self.numPlayers))
         self.players.append(RandComp.RandComp(2, "blue", "RandComp", self.numPlayers))
