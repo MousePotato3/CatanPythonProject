@@ -53,7 +53,6 @@ class Game:
             playerNum = i + 1
             settleLocation = self.players[i].chooseInitialSettlementLocation(self.board)
             self.board.addSettlement(settleLocation, self.playerColors[i], playerNum, True)
-            self.board.playerScores[playerNum - 1] += 1
             self.players[playerNum - 1].updateResourcePoints(settleLocation)
             self.players[playerNum - 1].score += 1
             print("Player", playerNum, "placed its first settlement at", int(settleLocation.x), int(settleLocation.y))
@@ -74,7 +73,6 @@ class Game:
             playerNum = j + 1
             settleLocation = self.players[j].chooseInitialSettlementLocation(self.board)
             self.board.addSettlement(settleLocation, self.playerColors[i], playerNum, True)
-            self.board.playerScores[playerNum - 1] += 1
             self.players[playerNum - 1].updateResourcePoints(settleLocation)
             self.players[playerNum - 1].score += 1
             neighbors = self.board.getAdjacentHexes(settleLocation)

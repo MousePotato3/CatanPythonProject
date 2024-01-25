@@ -37,7 +37,7 @@ class RandComp(Player):
         return hexValue
 
     """ 
-    Choose the best possible settlement location based on resource 
+    Choose the best possible initial settlement location based on resource 
     probability, resource diversity, access to ports, and a random factor
     """
     def chooseInitialSettlementLocation(self, board):
@@ -48,16 +48,16 @@ class RandComp(Player):
         for i in range(len(self.currentBoard.hexIntersections)):
             if self.currentBoard.legalPlacement(self.currentBoard.hexIntersections[i]):
                 random = randrange(20) / 10.0
-                hexValue = self.getHexValue(self.currentBoard.hexIntersections[i]) + random
-                if hexValue > maxValue:
+                hexValue = self.getHexValue(self.currentBoard.hexIntersections[i])
+                if hexValue + random > maxValue:
                     maxValue = hexValue
                     maxIndex = i
 
         return self.currentBoard.hexIntersections[maxIndex]
 
     """
-    Create a list of every intersection that a road can connect to the initial 
-    settlement location, and choose an intersection from the list at random
+        Create a list of every intersection that a road can connect to the initial 
+        settlement location, and choose an intersection from the list at random
     """
     def chooseInitialRoadLocation(self, settleLocation):
         possibleRoadPoints = self.currentBoard.getAdjacentIntersections(settleLocation)
@@ -150,6 +150,7 @@ class RandComp(Player):
                 """
                 if anySettlementIndex != -1:
                     if mySettlementIndex == -1:
+                        ''' TODO: This references the wrong player '''
                         hexValue += self.currentBoard.playerScores[self.playerNum - 1]
                     else:
                         hexValue -= 20
@@ -161,6 +162,7 @@ class RandComp(Player):
                 """
                 if anyCityIndex != -1:
                     if myCityIndex == -1:
+                        ''' TODO: This references the wrong player '''
                         hexValue += (self.currentBoard.playerScores[self.playerNum - 1] * 2)
                     else:
                         hexValue -= 40
@@ -430,7 +432,7 @@ class RandComp(Player):
                     continue
                 self.portResource(resourcesToTrade[i], resourceReceived)
 
-        """ Build a city, if possible """
+        """ Build a city, if possible, at the best location for the player while incorporating a random factor """
         if self.resources[0] >= 3 and self.resources[1] >= 2:
             cityIndex = -1
             maxValue = -10
@@ -445,7 +447,6 @@ class RandComp(Player):
                 self.resources[0] -= 3
                 self.resources[1] -= 2
                 self.currentBoard.addCity(cityPoints[cityIndex], self.color, self.playerNum, False)
-                self.currentBoard.playerScores[self.playerNum - 1] += 1
                 self.updateResourcePoints(cityPoints[cityIndex])
                 self.score += 1
                 return cityIndex
@@ -499,7 +500,6 @@ class RandComp(Player):
                 if newPortType != "":
                     self.gainPortPower(newPortType)
                     print("Player", self.playerNum, "just acquired a", newPortType, "port!")
-                self.currentBoard.playerScores[self.playerNum - 1] += 1
                 self.updateResourcePoints(settlementPoints[settlementIndex])
                 self.score += 1
                 return settlementIndex
@@ -547,27 +547,48 @@ class RandComp(Player):
         self.currentBoard = currentBoard
 
         while True:
+            """ Find all the locations where the player could potentially build a city """
             cityPoints = self.currentBoard.getPossibleCityLocations(self.playerNum)
+
+            """  Build a city, if it is possible to do so """
             cityIndex = self.placeCity(cityPoints)
-            if len(cityPoints) != 0:
-                cityPoints.remove(cityPoints[cityIndex])
+
+            """ Break out of the loop if it is not possible to build another city """
             if cityIndex == -1:
                 break
 
+            """ Remove the city location from the list of possible city locations """
+            if len(cityPoints) != 0:
+                cityPoints.remove(cityPoints[cityIndex])
+
         while True:
+            """ Find all the locations where the player could potentially build a settlement """
             settlementPoints = self.currentBoard.getPossibleSettlementLocations(self.playerNum)
+
+            """ Build a settlement, if it is possible to do so """
             settlementIndex = self.placeSettlement(settlementPoints)
-            if len(settlementPoints) != 0:
-                settlementPoints.remove(settlementPoints[settlementIndex])
+
+            """ Break out of the loop if it is not possible to build another settlement """
             if settlementIndex == -1:
                 break
 
+            """ Remove the settlement location from the list of possible settlement locations """
+            if len(settlementPoints) != 0:
+                settlementPoints.remove(settlementPoints[settlementIndex])
+
         while True:
+            """ Find all the locations where the player could potentially build a road """
             roadPoints = self.currentBoard.getPossibleRoadLocations(self.playerNum)
+
+            """ Build a road, if it is possible to do so """
             roadIndex = self.placeRoad(roadPoints)
-            if len(roadPoints) != 0:
-                roadPoints.remove(roadPoints[roadIndex])
+
+            """ Break out of the loop if it is not possible to build another road """
             if roadIndex == -1:
                 break
+
+            """ Remove the road location from the list of possible road locations """
+            if len(roadPoints) != 0:
+                roadPoints.remove(roadPoints[roadIndex])
 
         return self.currentBoard

@@ -15,7 +15,6 @@ from abc import ABC, abstractmethod
 from catan import Board
 from random import randrange
 
-
 class Player(ABC):
     """ Abstract class to hold each Settlers of Catan player in the game """
 
@@ -94,11 +93,11 @@ class Player(ABC):
     """ Trade a resource for another resource with the bank """
     def portResource(self, oldResource, newResource):
         if oldResource < 0 or oldResource > 4:
-            print("ERROR: Player", self.playerNum, "tried to port away resource number",
-                  oldResource, "which is not a valid resource")
+            print("ERROR: Player", self.playerNum, "tried to trade away invalid resource number",
+                  oldResource, "using a port")
         elif newResource < 0 or newResource > 4:
-            print("ERROR: Player", self.playerNum, "tried to port for resource number",
-                  newResource, "which is not a valid resource")
+            print("ERROR: Player", self.playerNum, "tried to trade for invalid resource number",
+                  newResource, "using a port")
         elif self.resources[oldResource] < self.tradeRates[oldResource]:
             """ Print an error message indicating an invalid attempt to trade resources """
             if self.tradeRates[oldResource] < 4:
@@ -156,7 +155,7 @@ class Player(ABC):
             case "wood":
                 self.tradeRates[4] = 2
             case _:
-                print("ERROR: Invalid port power gained by player", self.playerNum)
+                print("ERROR: Invalid port type", portType, "gained by player", self.playerNum)
 
     """ Temporarily adjust the trade rates of the player based on a port location being considered """
     def tempGainPortPower(self, portType):
@@ -176,7 +175,7 @@ class Player(ABC):
             case "wood":
                 self.tempTradeRates[4] = 2
             case _:
-                print("ERROR: Invalid port power gained by player", self.playerNum)
+                print("ERROR: Invalid port type", portType, "gained by player", self.playerNum, "while testing")
 
     """ Choose a random resource to be stolen or discarded """
     def getRandomResource(self):
@@ -206,14 +205,6 @@ class Player(ABC):
               "wheat,", self.resources[2], "sheep,", self.resources[3], "brick, and", self.resources[4], "wood")
 
     @abstractmethod
-    def getPlayerToRob(self):
-        pass
-
-    @abstractmethod
-    def getPointToBlock(self, playerToRob):
-        pass
-
-    @abstractmethod
     def chooseInitialSettlementLocation(self, board):
         pass
 
@@ -223,6 +214,14 @@ class Player(ABC):
 
     @abstractmethod
     def discard(self):
+        pass
+
+    @abstractmethod
+    def getPlayerToRob(self):
+        pass
+
+    @abstractmethod
+    def getPointToBlock(self, playerToRob):
         pass
 
     @abstractmethod
