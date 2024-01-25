@@ -118,11 +118,8 @@ class Board:
                   int(point.x), int(point.y), "which is too close to existing settlements")
         elif len(self.settlements[playerNum - 1]) >= 5:
             print("ERROR: Player", playerNum, "has the maximum number of settlements and cannot place any more")
-        elif not initialPlacement and self.numResources[playerNum - 1] < 4:
-            print("ERROR: Player", playerNum, "tried to place a settlement but does not have enough resources to do so")
         else:
             if not initialPlacement:
-                self.numResources[playerNum - 1] -= 4
                 print("Player", playerNum, "scored a point on turn", self.turnNumber,
                       "by placing a settlement at", int(point.x), int(point.y))
             self.settlements[playerNum - 1].append(Settlement.Settlement(point, color, playerNum))
@@ -139,11 +136,8 @@ class Board:
                   int(point.x), int(point.y), "but does not have a settlement at this location")
         elif len(self.cities[playerNum - 1]) >= 4:
             print("ERROR: Player", playerNum, "has the maximum number of cities and cannot place any more")
-        elif not initialPlacement and self.numResources[playerNum - 1] < 5:
-            print("ERROR: Player", playerNum, "tried to place a city but does not have enough resources to do so")
         else:
             if not initialPlacement:
-                self.numResources[playerNum - 1] -= 5
                 print("Player", playerNum, "scored a point on turn", self.turnNumber,
                       "by placing a city at", int(point.x), int(point.y))
             self.cities[playerNum - 1].append(City.City(point, color, playerNum))
@@ -167,12 +161,9 @@ class Board:
                       "and", int(point1.x), int(point1.y), "but there is already a road connecting these points")
         elif len(self.roads[playerNum - 1]) >= 15:
             print("ERROR: Player", playerNum, "has the maximum number of roads and cannot place any more")
-        elif not initialPlacement and self.numResources[playerNum - 1] < 2:
-            print("ERROR: Player", playerNum, "tried to place a road but does not have enough resources to do so")
         else:
             if point1.x < point2.x or (point1.x == point2.x and point1.y <= point2.y):
                 if not initialPlacement:
-                    self.numResources[playerNum - 1] -= 2
                     print("Player", playerNum, "placed a road between", int(point1.x), int(point1.y),
                           "and", int(point2.x), int(point2.y), "on turn", self.turnNumber)
                 self.roads[playerNum - 1].append(Road.Road(point1, point2, color, playerNum))

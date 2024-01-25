@@ -619,4 +619,7 @@ class RandComp(Player):
             if len(roadPoints) != 0:
                 roadPoints.remove(roadPoints[roadIndex])
 
+        """ Set the board's number of resources for the player based on the player's actual resources """
+        self.currentBoard.numResources[self.playerNum - 1] = self.getTotalResources()
+
         return self.currentBoard
