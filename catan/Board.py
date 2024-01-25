@@ -412,10 +412,18 @@ class Board:
         return myHexes
 
     """
+    Determine whether an intersection is connected to a player's road network
+    """
+    def isConnected(self, point, playerNum):
+        for i in range(len(self.roads[playerNum - 1])):
+            if self.roads[playerNum - 1][i].location1 == point or self.roads[playerNum - 1][i].location2 == point:
+                return True
+        return False
+
+    """
     Determine whether an intersection is legal for placing a settlement
     (no settlements or cities at the intersection or any adjacent intersections)
     """
-
     def legalPlacement(self, point):
         isHexLegal = True
 

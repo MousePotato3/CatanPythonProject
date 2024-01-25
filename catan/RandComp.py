@@ -36,6 +36,25 @@ class RandComp(Player):
         self.tempTradeRates = [4, 4, 4, 4, 4]
         return hexValue
 
+    def getRoadValue(self, possibleRoad):
+        roadValue = 0
+
+        if not self.currentBoard.isConnected(possibleRoad.p1, self.playerNum):
+            roadValue += self.getHexValue(possibleRoad.p1)
+            adjacentIntersections = self.currentBoard.getAdjacentIntersections(possibleRoad.p1)
+            for i in range(len(adjacentIntersections)):
+                if self.currentBoard.legalPlacement(adjacentIntersections[i]):
+                    roadValue += self.getHexValue(adjacentIntersections[i]) / 10
+
+        if not self.currentBoard.isConnected(possibleRoad.p2, self.playerNum):
+            roadValue += self.getHexValue(possibleRoad.p2)
+            adjacentIntersections = self.currentBoard.getAdjacentIntersections(possibleRoad.p2)
+            for i in range(len(adjacentIntersections)):
+                if self.currentBoard.legalPlacement(adjacentIntersections[i]):
+                    roadValue += self.getHexValue(adjacentIntersections[i]) / 10
+
+        return roadValue
+
     """ 
     Choose the best possible initial settlement location based on resource 
     probability, resource diversity, access to ports, and a random factor
@@ -48,8 +67,8 @@ class RandComp(Player):
         for i in range(len(self.currentBoard.hexIntersections)):
             if self.currentBoard.legalPlacement(self.currentBoard.hexIntersections[i]):
                 random = randrange(20) / 10.0
-                hexValue = self.getHexValue(self.currentBoard.hexIntersections[i])
-                if hexValue + random > maxValue:
+                hexValue = self.getHexValue(self.currentBoard.hexIntersections[i]) + random
+                if hexValue > maxValue:
                     maxValue = hexValue
                     maxIndex = i
 
@@ -432,14 +451,14 @@ class RandComp(Player):
                     continue
                 self.portResource(resourcesToTrade[i], resourceReceived)
 
-        """ Build a city, if possible, at the best location for the player while incorporating a random factor """
+        """ Build a city at the best location for the player while incorporating a random factor """
         if self.resources[0] >= 3 and self.resources[1] >= 2:
             cityIndex = -1
             maxValue = -10
             for i in range(len(cityPoints)):
                 random = randrange(20) / 10.0
-                cityValue = self.getHexValue(cityPoints[i])
-                if cityValue + random > maxValue:
+                cityValue = self.getHexValue(cityPoints[i]) + random
+                if cityValue > maxValue:
                     maxValue = cityValue
                     cityIndex = i
 
@@ -479,14 +498,14 @@ class RandComp(Player):
                     continue
                 self.portResource(resourcesToTrade[i], resourceReceived)
 
-        """ Build a settlement """
+        """ Build a settlement at the best location for the player while incorporating a random factor """
         if self.resources[1] > 0 and self.resources[2] > 0 and self.resources[3] > 0 and self.resources[4] > 0:
             settlementIndex = -1
             maxValue = -10
             for i in range(len(settlementPoints)):
                 random = randrange(20) / 10.0
-                settlementValue = self.getHexValue(settlementPoints[i])
-                if settlementValue + random > maxValue:
+                settlementValue = self.getHexValue(settlementPoints[i]) + random
+                if settlementValue > maxValue:
                     maxValue = settlementValue
                     settlementIndex = i
 
@@ -528,14 +547,23 @@ class RandComp(Player):
                     continue
                 self.portResource(resourcesToTrade[i], resourceReceived)
 
-        """ Build a road """
+        """ Build a road at the best location for the player while incorporating a random factor """
         if self.resources[3] > 0 and self.resources[4] > 0:
-            self.resources[3] -= 1
-            self.resources[4] -= 1
-            roadIndex = randrange(len(roadPoints))
-            self.currentBoard.addRoad(roadPoints[roadIndex].p1, roadPoints[roadIndex].p2, self.color, self.playerNum,
-                                      False)
-            return roadIndex
+            roadIndex = -1
+            maxValue = -10
+            for i in range(len(roadPoints)):
+                random = randrange(20) / 10.0
+                roadValue = self.getRoadValue(roadPoints[i]) + random
+                if roadValue > maxValue:
+                    maxValue = roadValue
+                    roadIndex = i
+
+            if roadIndex != -1:
+                self.resources[3] -= 1
+                self.resources[4] -= 1
+                self.currentBoard.addRoad(roadPoints[roadIndex].p1, roadPoints[roadIndex].p2, self.color,
+                                          self.playerNum, False)
+                return roadIndex
         return -1
 
     """
