@@ -36,9 +36,14 @@ class RandComp(Player):
         self.tempTradeRates = [4, 4, 4, 4, 4]
         return hexValue
 
+    """
+    Calculate the expected value of a possible road location, 
+    based on settlements that could potentially be acquired nearby
+    """
     def getRoadValue(self, possibleRoad):
         roadValue = 0
 
+        """ Only count the value of locations that are not already part of a player's road network """
         if not self.currentBoard.isConnected(possibleRoad.p1, self.playerNum):
             roadValue += self.getHexValue(possibleRoad.p1)
             adjacentIntersections = self.currentBoard.getAdjacentIntersections(possibleRoad.p1)
@@ -75,26 +80,35 @@ class RandComp(Player):
         return self.currentBoard.hexIntersections[maxIndex]
 
     """
-        Create a list of every intersection that a road can connect to the initial 
-        settlement location, and choose an intersection from the list at random
+    Create a list of every intersection that a road can connect to the initial 
+    settlement location, and choose an intersection from the list at random
     """
     def chooseInitialRoadLocation(self, settleLocation):
         possibleRoadPoints = self.currentBoard.getAdjacentIntersections(settleLocation)
         roadPointIndex = randrange(len(possibleRoadPoints))
         return possibleRoadPoints[roadPointIndex]
 
-    """ Discard resources from the player at random """
+    """ 
+    Discard resources from the player, prioritizing both the resources that the player has 
+    a lot of right now and resources that the player is likely to collect more of later
+    """
     def discard(self):
         numDiscardResources = int(self.getTotalResources() / 2)
+        maxResourceType = -1
+        maxResourceAccess = -100
 
+        print("Player", self.playerNum, "discarded", numDiscardResources,
+              "resources on turn", self.currentBoard.turnNumber)
         for _ in range(numDiscardResources):
-            resourceType = self.getRandomResource()
-            if resourceType != -1:
-                self.resources[resourceType] -= 1
-            else:
-                print("ERROR: Player", self.playerNum, "discarded resources incorrectly")
+            for i in range(len(self.resources)):
+                resourceAccess = self.resources[i] * self.resources[i] + self.resourcePoints[i]
+                if self.resources[i] > 0 and resourceAccess > maxResourceAccess:
+                    maxResourceType = i
+                    maxResourceAccess = resourceAccess
+            self.resources[maxResourceType] -= 1
 
-        self.currentBoard.numResources[self.playerNum - 1] -= numDiscardResources
+        """ Set the board's number of resources for the player based on the player's actual resources """
+        self.currentBoard.numResources[self.playerNum - 1] = self.getTotalResources()
 
     """
     Generate a random number between 0 and 2 and add it to each player's score, 
@@ -150,7 +164,7 @@ class RandComp(Player):
 
         """
         Assign a significant negative value if we are blocking ourselves. 
-        Otherwise the value of a location to block is sum(playerPoints)*hexValue, 
+        Otherwise the value of a location to block is sum(playerPoints) * hexValue, 
         where playerPoints count double for a city compared to a settlement.
         """
         for i in range(len(possibleBlockLocations)):
@@ -221,11 +235,12 @@ class RandComp(Player):
             Store the resources that are traded to the bank in a list.
             """
             while maxRemainingResources >= 0:
+                """ If a city can be built, return the list of resources to trade """
                 if tempResources[0] >= 3 and tempResources[1] >= 2:
                     return resourcesToTrade
-                maxIndex = 0
 
                 """ Consider trading ore to the bank to build a city """
+                maxIndex = 0
                 maxRemainingResources = tempResources[0] - 3 - self.tradeRates[0]
 
                 """ Consider trading wheat to the bank to build a city """
@@ -296,11 +311,12 @@ class RandComp(Player):
             Store the resources that are traded to the bank in a list.
             """
             while maxRemainingResources >= 0:
+                """ If a settlement can be built, return the list of resources to trade """
                 if tempResources[1] > 0 and tempResources[2] > 0 and tempResources[3] > 0 and tempResources[4] > 0:
                     return resourcesToTrade
-                maxIndex = 0
 
                 """ Consider trading ore to the bank to build a settlement """
+                maxIndex = 0
                 maxRemainingResources = tempResources[0] - self.tradeRates[0]
 
                 """ Consider trading wheat to the bank to build a settlement """
@@ -375,11 +391,12 @@ class RandComp(Player):
             Store the resources that are traded to the bank in a list.
             """
             while maxRemainingResources >= 0:
+                """ If a road can be built, return the list of resources to trade """
                 if tempResources[3] > 0 and tempResources[4] > 0:
                     return resourcesToTrade
-                maxIndex = 0
 
                 """ Consider trading ore to the bank to build a road """
+                maxIndex = 0
                 maxRemainingResources = tempResources[0] - self.tradeRates[0]
 
                 """ Consider trading wheat to the bank to build a road """

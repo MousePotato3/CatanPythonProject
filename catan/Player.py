@@ -1,9 +1,8 @@
 """
-Stores a copy of the player's game board which is passed back to the Game class 
-after any changes are made. Also keeps track of player resource types, player 
-development cards, and the number of points this player has (including hidden 
-development cards). If the player wins the game, the turn ends and the player 
-returns this information to the game class.
+Stores a copy of the player's game board which is passed back to the Game class after any
+changes are made. Also keeps track of player resource types, player development cards, and
+the number of points this player has (including hidden development cards). If the player
+wins the game, the turn ends and the player returns this information to the game class.
 
 Includes abstract methods that the class for each player type must override.
 
@@ -35,21 +34,24 @@ class Player(ABC):
 
     """ Add a resource by index for the player, and add 1 to the player's number of resources """
     def gainResource(self, resourceIndex):
-        if 0 <= resourceIndex <= 4:
-            self.resources[resourceIndex] += 1
-            self.currentBoard.numResources[self.playerNum - 1] += 1
-        else:
+        if resourceIndex < 0 or resourceIndex > 4:
             print("ERROR: Player", self.playerNum, "tried to collect resource number",
                   resourceIndex, "which is not a valid resource")
+        else:
+            self.resources[resourceIndex] += 1
+            self.currentBoard.numResources[self.playerNum - 1] += 1
 
     """ Remove a resource by index for the player, and subtract 1 from the player's number of resources """
     def loseResource(self, resourceIndex):
-        if 0 <= resourceIndex <= 4:
-            self.resources[resourceIndex] -= 1
-            self.currentBoard.numResources[self.playerNum - 1] -= 1
-        else:
+        if resourceIndex < 0 or resourceIndex > 4:
             print("ERROR: Player", self.playerNum, "tried to discard resource number",
                   resourceIndex, "which is not a valid resource")
+        elif self.resources[resourceIndex] < 1:
+            print("ERROR: Player", self.playerNum, "tried to discard resource number",
+                  resourceIndex, "but has none of this resource")
+        else:
+            self.resources[resourceIndex] -= 1
+            self.currentBoard.numResources[self.playerNum - 1] -= 1
 
     """ Return the text corresponding to a resource index """
     @staticmethod
@@ -90,7 +92,7 @@ class Player(ABC):
         if self.getResourceIndex(resourceType) != -1:
             self.gainResource(self.getResourceIndex(resourceType))
 
-    """ Trade a resource for another resource with the bank """
+    """ Trade a resource for another resource with a port or the bank """
     def portResource(self, oldResource, newResource):
         if oldResource < 0 or oldResource > 4:
             print("ERROR: Player", self.playerNum, "tried to trade away invalid resource number",
@@ -99,7 +101,6 @@ class Player(ABC):
             print("ERROR: Player", self.playerNum, "tried to trade for invalid resource number",
                   newResource, "using a port")
         elif self.resources[oldResource] < self.tradeRates[oldResource]:
-            """ Print an error message indicating an invalid attempt to trade resources """
             if self.tradeRates[oldResource] < 4:
                 print("ERROR: Player", self.playerNum, "tried to trade", oldResource.getResourceType(),
                       "using a port. This player has", self.resources[oldResource], "and needs at least",
@@ -109,11 +110,9 @@ class Player(ABC):
                       "with the bank. This player has", self.resources[oldResource], "and needs at least",
                       self.tradeRates[oldResource], "to make this trade.")
         else:
-            """ Trade the old resource of the player for the new resource """
             self.resources[newResource] += 1
             self.resources[oldResource] -= self.tradeRates[oldResource]
 
-            """ Print a message indicating which resources where traded and whether a port was used """
             if self.tradeRates[oldResource] < 4:
                 print("Player", self.playerNum, "just traded", self.tradeRates[oldResource],
                       self.getResourceType(oldResource), "for 1",

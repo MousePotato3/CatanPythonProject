@@ -23,7 +23,10 @@ from math import sqrt
 from random import shuffle
 import PySimpleGUI
 
-""" Structure to hold the coordinates of each intersection on the Catan board """
+"""
+Structure to keep track of the Settlers of Catan board, all of the objects 
+on the board, and each player's score, resources, and development cards
+"""
 class Board:
 
     def __init__(self, numPlayers):
@@ -188,9 +191,12 @@ class Board:
             self.tiles.append(Hexagon.Hexagon("wheat"))
         for _ in range(4):
             self.tiles.append(Hexagon.Hexagon("wood"))
-
         shuffle(self.tiles)
-        """ Assign locations of the center of each Hexagon on the Catan board """
+
+        """ 
+        Assign locations of the center of each Hexagon on the Catan board, 
+        starting at the top and moving counter-clockwise toward the center 
+        """
         self.hexCenters.append(Point.Point(self.centerX, self.centerY - 2 * self.height * 2))
         self.hexCenters.append(
             Point.Point(self.centerX - (self.width + self.smallWidth), self.centerY - 3 * self.height))
